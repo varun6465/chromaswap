@@ -1,0 +1,99 @@
+#!/bin/bash
+
+
+# a project by @varun6465
+# changes the visuals of the homescreen automatically of all the nix operating systems
+# created using the bash script
+
+#Dependency:
+#          feh
+#          change PIC_DIR to point to your backgrounds and pulls them
+#          if -t is provided
+#          it must precede other flags
+
+
+
+
+
+default_interval=120
+#background path
+PIC_DIR="/home/varun/taylorswift/backgrounds/"
+PIC_LIST=("$PIC_DIR"*)
+
+#Help msg
+usage () {
+    echo "Usage: $0 [-h] [-t interval] [-e] [-r reverse]"
+    echo "Options:"
+    echo "  -t interval    Set wallpaper change interval in seconds (default: $default_interval). Must precede other flags if provided"
+    echo "  -e             Start from a random wallpaper"
+    echo "  -r             Set wallpaper in reverse order"
+    echo "  -h             Display this help message"
+}
+
+#Main Function starts here 
+set_pic() {
+    local interval=${1:-$default_interval}
+    while true
+    do
+        if [ "$2" == "-r" ]; then
+            for (( i=${#PIC_LIST[@]}-1; i>=0; i-- ))
+            do
+                feh --bg-scale "${PIC_LIST[i]}"
+                sleep "${interval}"
+            done
+        elif [ "$2" == "-e" ]; then
+            #creating the random
+            random_pic=${PIC_LIST[$RANDOM % ${#PIC_LIST[@]}]}
+
+            for i in "${PIC_LIST[@]}"
+            do
+                feh --bg-scale "$i"
+                sleep "${interval}"
+            done
+        else
+            # Loops through the array normally if no flag is given
+            for i in "${PIC_LIST[@]}"
+            do
+                feh --bg-scale "$i"
+                sleep "${interval}"
+            done
+        fi
+    done
+}
+
+#getops
+while getopts ":ht:re" opt; do
+    case ${opt} in
+        h ) usage
+            exit 0
+            ;;
+        t )
+            interval=${OPTARG}
+            ;;
+        r )
+            set_pic ${interval:-$default_interval} "-r"
+            exit 0
+            ;;
+        e )
+            set_pic ${interval:-$default_interval} "-r"
+            exit 0
+            ;;
+        \? )
+            echo "Invalid argument: -$OPTARG" 1>&2
+            exit 1
+            ;;
+        : )
+            interval=${default_interval}
+            ;;
+    esac
+done
+shift $((OPTIND -1))
+
+interval=${interval:-$default_interval}
+
+# Call the set_pic function
+if [ -z "${1}" ]; then
+    set_pic ${interval}
+else
+    set_pic ${1} ${interval}
+fi
