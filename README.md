@@ -8,7 +8,7 @@ change the directory
 >> cd chromaswap
 >> ls
 
-#giving the permmisons
+giving the permmisons
 >> chmod +x *
 which gives permission to all the files in the folder
  run the file by adding ./ infront of the file
